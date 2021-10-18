@@ -1,7 +1,6 @@
 @extends('layouts.main')
 @section('title', '一覧画面')
 @section('content')
-    <h1>おもひでの画像一覧</h1>
     @include('partial.flash')
     @include('partial.errors')
     <section class="row position-relative" data-masonry='{ "percentPosition": true }'>
