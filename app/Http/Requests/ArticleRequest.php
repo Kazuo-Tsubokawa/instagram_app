@@ -13,7 +13,7 @@ class ArticleRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,8 +23,16 @@ class ArticleRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
+        $rule = [
+            'caption' => 'required|max:255',
+            'info' => 'max:255',
         ];
+
+        $route = $this->route()->getName();
+        if ($route === 'articles.store') {
+            $rule['file'] = 'required|file|image';
+        }
+        
+        return $rule;
     }
 }
