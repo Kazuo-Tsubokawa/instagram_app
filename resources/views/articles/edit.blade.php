@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title', '編集画面')
+@section('title', 'おもひでを編集するよ')
 @section('content')
     @include('partial.flash')
     @include('partial.errors')

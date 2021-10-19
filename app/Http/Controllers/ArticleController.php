@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Article::class, 'article');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -42,7 +47,7 @@ class ArticleController extends Controller
     public function store(ArticleRequest $request)
     {
         $article = new Article($request->all());
-        $article->user_id = 1;
+        $article->user_id = $request->user()->id;
         $file = $request->file('file');
 
         DB::beginTransaction();

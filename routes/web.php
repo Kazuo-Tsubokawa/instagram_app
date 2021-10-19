@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ArticleController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Auth\OAuthController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [ArticleController::class, 'index']);
+Route::get('/', [ArticleController::class, 'index'])
+    ->name('root');
 
 Route::resource('articles', ArticleController::class)
     ->middleware(['auth'])
@@ -28,3 +29,13 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 require __DIR__ . '/auth.php';
+
+Route::prefix('auth')->middleware('guest')->group(function () {
+    Route::get('/{provider}', [OAuthController::class, 'redirectToProvider'])
+        ->where('provider', 'github|google')
+        ->name('redirectToProvider');
+
+    Route::get('/{provider}/callback', [OAuthController::class, 'oauthCallback'])
+        ->where('provider', 'github|google')
+        ->name('oauthCallback');
+});
