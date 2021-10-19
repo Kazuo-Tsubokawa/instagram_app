@@ -1,5 +1,6 @@
 // Fonts
 @import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@800&display=swap');
 
 // Variables
 @import 'variables';
@@ -18,4 +19,8 @@
     right: 50px;
     z-index: 10;
     color: orchid;
+}
+
+.logo {
+    font-family: 'M PLUS 1p', sans-serif;
 }
