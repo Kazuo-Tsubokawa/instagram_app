@@ -48,27 +48,29 @@ class ArticleController extends Controller
     {
         $article = new Article($request->all());
         $article->user_id = $request->user()->id;
-        $file = $request->file('file');
+        $files = $request->file('file');
 
         DB::beginTransaction();
         try {
             $article->save();
 
-            if (!$path = Storage::putFile('articles', $file)) {
-                throw new Exception('ファイルの保存に失敗しました');
+            foreach ($files as $file) {
+                $file_name = $file->getClientOriginalName();
+                $path = Storage::putFile('articles', $file);
+
+                $attachment = new Attachment();
+                $attachment->article_id = $article->id;
+                $attachment->org_name = $file_name;
+                $attachment->name = basename($path);
+
+                $attachment->save();
             }
-
-            $attachment = new Attachment([
-                'article_id' => $article->id,
-                'org_name' => $file->getClientOriginalName(),
-                'name' => basename($path),
-            ]);
-
-            $attachment->save();
             DB::commit();
         } catch (\Exception $e) {
-            if (!empty($path)) {
-                Storage::delete($path);
+            foreach ($file as $file) {
+                if (!empty($path)) {
+                    Storage::delete($path);
+                }
             }
             DB::rollback();
             return back()
@@ -131,19 +133,11 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        $path = $article->image_path;
+        $attachments = $article->attachments;
+        $article->delete();
 
-        DB::beginTransaction();
-        try {
-            $article->delete();
-            if (!Storage::delete($path)) {
-                throw new Exception('ファイルの削除に失敗しました');
-            }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()
-                ->withErrors($e->getMessage());
+        foreach ($attachments as $attachment) {
+            Storage::delete('articles/' . $attachment->name);
         }
         return redirect()
             ->route('articles.index')
