@@ -62,12 +62,11 @@ class ArticleController extends Controller
                 $attachment->article_id = $article->id;
                 $attachment->org_name = $file_name;
                 $attachment->name = basename($path);
-
-                $attachment->save();
             }
+            $attachment->save();
             DB::commit();
         } catch (\Exception $e) {
-            foreach ($file as $file) {
+            foreach ($files as $file) {
                 if (!empty($path)) {
                     Storage::delete($path);
                 }
