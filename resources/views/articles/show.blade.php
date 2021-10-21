@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-6">
                         <figcaption>
-                            <h1>{{ $article->caption }}</h1>
+                            <h1 class="text-2xl block mb-4">{{ $article->caption }}</h1>
                             <h3>{{ $article->info }}</h3>
                         </figcaption>
                     </div>
