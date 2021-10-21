@@ -9,6 +9,8 @@ use Exception;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
+use function PHPUnit\Framework\throwException;
+
 class ArticleController extends Controller
 {
 
@@ -48,26 +50,30 @@ class ArticleController extends Controller
     {
         $article = new Article($request->all());
         $article->user_id = $request->user()->id;
-        $files = $request->file('file');
-
+        // $files = $request->file('file');
+        $paths = [];
         DB::beginTransaction();
         try {
             $article->save();
 
-            foreach ($files as $file) {
-                $file_name = $file->getClientOriginalName();
-                $path = Storage::putFile('articles', $file);
+            if ($files = $request->file('file')) {
+                foreach ($files as $file) {
+                    $file_name = $file->getClientOriginalName();
+                    $path = Storage::putFile('articles', $file);
+                    $paths[] = $path;
 
-                $attachment = new Attachment();
-                $attachment->article_id = $article->id;
-                $attachment->org_name = $file_name;
-                $attachment->name = basename($path);
+                    $attachment = new Attachment();
+                    $attachment->article_id = $article->id;
+                    $attachment->org_name = $file_name;
+                    $attachment->name = basename($path);
+                    $attachment->save();
+                }
             }
-            $attachment->save();
+            
             DB::commit();
         } catch (\Exception $e) {
-            foreach ($files as $file) {
-                if (!empty($path)) {
+            if ($paths) {
+                foreach ($paths as $path) {
                     Storage::delete($path);
                 }
             }
